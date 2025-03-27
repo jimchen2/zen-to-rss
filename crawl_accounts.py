@@ -25,7 +25,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-def extract_dzen_channel_data(url, article_limit=5):
+def extract_dzen_channel_data(url, article_limit):
     # Setup Chrome options
     chrome_options = Options()
     # chrome_options.add_argument("--headless")  
