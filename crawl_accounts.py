@@ -1,9 +1,7 @@
 # example https://dzen.ru/tourister?tab=articles
 
 # Setup Selenium
-
-# Extract Cookie from Chrome
-# Use Chrome Cookie
+# Need Russian IP, or else Blocked
 
 # Return:
 # channel title, channel image url, channel description, links to the all the articles(array)
@@ -27,7 +25,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-def extract_dzen_channel_data(url):
+def extract_dzen_channel_data(url, article_limit=15):
     # Setup Chrome options
     chrome_options = Options()
     # chrome_options.add_argument("--headless")  
@@ -36,7 +34,7 @@ def extract_dzen_channel_data(url):
     driver = webdriver.Chrome(options=chrome_options)
     
     try:
-        # First navigate to the page
+        # Navigate to the page
         driver.get(url)
         time.sleep(2)  # Wait for the page to fully load
         
@@ -68,6 +66,10 @@ def extract_dzen_channel_data(url):
             new_links_found = 0
             
             for row in zen_rows:
+                # Stop if we've reached the desired number of articles
+                if len(article_links) >= article_limit:
+                    return 0
+                    
                 row_id = row.get_attribute('id')
                 if row_id not in unique_article_ids:
                     unique_article_ids.add(row_id)
@@ -82,6 +84,10 @@ def extract_dzen_channel_data(url):
                             if clean_url not in article_links:
                                 article_links.append(clean_url)
                                 new_links_found += 1
+                                
+                                # Stop if we've reached the desired number of articles
+                                if len(article_links) >= article_limit:
+                                    return new_links_found
             
             return new_links_found
             
@@ -89,13 +95,16 @@ def extract_dzen_channel_data(url):
         no_new_links_counter = 0
         max_attempts = 10  # Maximum attempts without finding new links
         
-        while no_new_links_counter < max_attempts:
+        while len(article_links) < article_limit and no_new_links_counter < max_attempts:
             # Get current scroll position
             previous_height = driver.execute_script("return document.body.scrollHeight")
             
             # Extract articles in the current viewport
             new_links = extract_articles()
             
+            if len(article_links) >= article_limit:
+                break
+                
             if new_links == 0:
                 no_new_links_counter += 1
             else:
@@ -113,6 +122,9 @@ def extract_dzen_channel_data(url):
             except TimeoutException:
                 # If scroll height doesn't change, we may have reached the end
                 no_new_links_counter += 1
+        
+        # Ensure we only return the requested number of articles
+        article_links = article_links[:article_limit]
                 
         return {
             "channel_title": channel_title,
@@ -127,12 +139,12 @@ def extract_dzen_channel_data(url):
 # Example usage
 if __name__ == "__main__":
     channel_url = "https://dzen.ru/tourister?tab=articles"
-    result = extract_dzen_channel_data(channel_url)
+    result = extract_dzen_channel_data(channel_url, article_limit=15)
     
     print(f"Channel Title: {result['channel_title']}")
     print(f"Channel Image URL: {result['channel_image_url']}")
     print(f"Channel Description: {result['channel_description']}")
     print(f"Total Articles Found: {len(result['article_links'])}")
-    print("\nFirst 5 Article Links:")
-    for link in result['article_links'][:5]:
+    print("\nLatest 15 Article Links:")
+    for link in result['article_links']:
         print(link)
