@@ -53,7 +53,7 @@ def create_rss_feed(channel_url, output_file="feed.xml"):
         
         # Get article details in parallel
         articles_data = []
-        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
             futures = []
             for url in channel_data["article_links"]:
                 print(f"Queuing article: {url}")
