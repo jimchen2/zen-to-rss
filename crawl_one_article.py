@@ -71,6 +71,7 @@ def scrape_dzen_article(url):
         
         # Get the processed HTML
         processed_html = str(soup)
+        driver.quit()
         
         return {
             'title': title,
@@ -87,9 +88,10 @@ if __name__ == "__main__":
     url = "https://dzen.ru/a/Z9khBocwVgufmUKF"
     article_data = scrape_dzen_article(url)
     
+
     if article_data:
         print("Title:", article_data['title'])
         print("Date:", article_data['date'])
-        print("HTML:", article_data['content_html'])
+        # print("HTML:", article_data['content_html'])
         # with open('article_content.html', 'w', encoding='utf-8') as f:
         #     f.write(article_data['content_html'])

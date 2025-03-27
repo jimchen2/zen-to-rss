@@ -25,7 +25,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
-def extract_dzen_channel_data(url, article_limit=15):
+def extract_dzen_channel_data(url, article_limit=5):
     # Setup Chrome options
     chrome_options = Options()
     # chrome_options.add_argument("--headless")  
@@ -93,7 +93,7 @@ def extract_dzen_channel_data(url, article_limit=15):
             
         # Scroll and extract articles
         no_new_links_counter = 0
-        max_attempts = 10  # Maximum attempts without finding new links
+        max_attempts = 3  # Maximum attempts without finding new links
         
         while len(article_links) < article_limit and no_new_links_counter < max_attempts:
             # Get current scroll position
@@ -139,7 +139,7 @@ def extract_dzen_channel_data(url, article_limit=15):
 # Example usage
 if __name__ == "__main__":
     channel_url = "https://dzen.ru/tourister?tab=articles"
-    result = extract_dzen_channel_data(channel_url, article_limit=15)
+    result = extract_dzen_channel_data(channel_url, article_limit=5)
     
     print(f"Channel Title: {result['channel_title']}")
     print(f"Channel Image URL: {result['channel_image_url']}")
